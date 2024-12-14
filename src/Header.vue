@@ -75,12 +75,12 @@ function toggleDark() {
   <nav>
     <h1>
       <img alt="logo" src="/logo.svg">
-      <span>Pro Naive Ui Playground</span>
+      <span>Pro Naive UI Playground</span>
     </h1>
     <div class="links">
       <VersionSelect
         :model-value="proNaiveUiVersion" pkg="pro-naive-ui"
-        label="Pro Naive Ui Version" @update:model-value="setProNaiveUiVersion"
+        label="Pro Naive UI Version" @update:model-value="setProNaiveUiVersion"
       />
       <VersionSelect v-model="store.typescriptVersion" pkg="typescript" label="TypeScript Version" />
       <VersionSelect :model-value="vueVersion" pkg="vue" label="Vue Version" @update:model-value="setVueVersion">
