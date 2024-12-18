@@ -4,6 +4,8 @@ import { Repl, mergeImportMap, useStore, useVueImportMap } from '@vue/repl'
 import Monaco from '@vue/repl/monaco-editor'
 import { computed, onMounted, ref, watchEffect } from 'vue'
 import Header from './Header.vue'
+import { getProNaiveUiUrl } from './utils'
+import Welcome from './template/welcome.vue?raw'
 
 const previewOptions = {
   headHTML: `
@@ -29,8 +31,8 @@ const previewOptions = {
 
 const customImportMap = ref({
   imports: {
-    'naive-ui': 'https://naive-ui.pro-components.cn/naive-ui.mjs',
-    'pro-naive-ui': 'https://naive-ui.pro-components.cn/test.js',
+    'naive-ui': 'https://unpkg.com/naive-ui/dist/index.mjs',
+    'pro-naive-ui': getProNaiveUiUrl(),
   },
 })
 
@@ -66,6 +68,9 @@ const store = useStore(
   {
     builtinImportMap: mergedImportMap as any as StoreState['builtinImportMap'],
     vueVersion,
+    template: ref({
+      welcomeSFC: Welcome
+    })
   },
   hash,
 )
@@ -92,9 +97,11 @@ function reloadPage() {
 }
 
 function toggleProNaiveUiVersion(version: string) {
-  const currentMapUrl = store.getImportMap().imports?.['pro-naive-ui'] ?? ''
-  const replaceUrl = currentMapUrl.replace(/\/test.*\.js$/, `/test@${version}.js`)
-  customImportMap.value.imports['pro-naive-ui'] = replaceUrl
+  const blackVersionList = [
+    '1.0.0'
+  ]
+  if (blackVersionList.includes(version)) return
+  customImportMap.value.imports['pro-naive-ui'] = getProNaiveUiUrl(version)
 }
 
 const theme = ref<'dark' | 'light'>('dark')
@@ -108,30 +115,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <Header
-    :store="store"
-    :ssr="useSSRMode"
-    :auto-save="autoSave"
-    @toggle-ssr="toggleSSR"
-    @reload-page="reloadPage"
-    @toggle-theme="toggleTheme"
-    @toggle-autosave="toggleAutoSave"
-    @toggle-pro-components-version="toggleProNaiveUiVersion"
-  />
-  <Repl
-    ref="replRef"
-    :store="store"
-    :theme="theme"
-    :editor="Monaco"
-    :ssr="useSSRMode"
-    :auto-save="autoSave"
-    :auto-resize="true"
-    :clear-console="false"
-    :show-compile-output="true"
-    :preview-options="previewOptions"
-    @keydown.ctrl.s.prevent
-    @keydown.meta.s.prevent
-  />
+  <Header :store="store" :ssr="useSSRMode" :auto-save="autoSave" @toggle-ssr="toggleSSR" @reload-page="reloadPage"
+    @toggle-theme="toggleTheme" @toggle-autosave="toggleAutoSave"
+    @toggle-pro-naive-ui-version="toggleProNaiveUiVersion" />
+  <Repl ref="replRef" :store="store" :theme="theme" :editor="Monaco" :ssr="useSSRMode" :auto-save="autoSave"
+    :auto-resize="true" :clear-console="false" :show-compile-output="true" :preview-options="previewOptions"
+    @keydown.ctrl.s.prevent @keydown.meta.s.prevent />
 </template>
 
 <style>
