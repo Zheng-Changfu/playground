@@ -1,12 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { ProCard } from 'pro-naive-ui'
+import { NButton } from 'naive-ui'
 
 const msg = ref('Hello World!')
 </script>
 
 <template>
-  <pro-card title="Welcome">
-    <span class="c-red">{{ msg }}</span>
-  </pro-card>
+  <h1 class="c-red">Welcome</h1>
+  <n-button type="primary">{{ msg }}</n-button>
 </template>
