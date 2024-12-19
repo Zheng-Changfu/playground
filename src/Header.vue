@@ -1,107 +1,141 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue'
-import type { ReplStore } from '@vue/repl'
-import Sun from './icons/Sun.vue'
-import Moon from './icons/Moon.vue'
-import Share from './icons/Share.vue'
-import GitHub from './icons/GitHub.vue'
-import Reload from './icons/Reload.vue'
-import VersionSelect from './VersionSelect.vue'
+import { computed, ref } from "vue";
+import type { ReplStore } from "@vue/repl";
+import Sun from "./icons/Sun.vue";
+import Moon from "./icons/Moon.vue";
+import Share from "./icons/Share.vue";
+import GitHub from "./icons/GitHub.vue";
+import Reload from "./icons/Reload.vue";
+import VersionSelect from "./VersionSelect.vue";
 
 const props = defineProps<{
-  store: ReplStore
-  ssr: boolean
-  autoSave: boolean
-}>()
+  ssr: boolean;
+  prod: boolean;
+  store: ReplStore;
+  autoSave: boolean;
+}>();
 const emit = defineEmits([
-  'toggleSsr',
-  'reloadPage',
-  'toggleTheme',
-  'toggleAutosave',
-  'toggleProNaiveUiVersion',
-])
+  "toggleSsr",
+  "reloadPage",
+  "toggleProd",
+  "toggleTheme",
+  "toggleAutosave",
+  "toggleNaiveUiVersion",
+  "toggleProNaiveUiVersion",
+]);
 
-const { store } = props
-const proNaiveUiVersion = getCurrentVersion('pro-naive-ui')
+const { store } = props;
+const proNaiveUiVersion = ref("latest");
+const naiveUiVersion = ref("latest");
 
-const currentCommit = 'latest'
+const currentCommit = "latest";
 
 const vueVersion = computed(() => {
   if (store.loading) {
-    return 'loading...'
+    return "loading...";
   }
-  return store.vueVersion || 'latest'
-})
+  return store.vueVersion || "latest";
+});
 
 async function setVueVersion(v: string) {
-  store.vueVersion = v
+  store.vueVersion = v;
 }
 
 function resetVueVersion() {
-  store.vueVersion = null
+  store.vueVersion = null;
 }
 
 async function setProNaiveUiVersion(v: string) {
-  proNaiveUiVersion.value = v
-  emit('toggleProNaiveUiVersion', v)
+  proNaiveUiVersion.value = v;
+  emit("toggleProNaiveUiVersion", v);
+}
+
+async function setNaiveUiVersion(v: string) {
+  naiveUiVersion.value = v;
+  emit("toggleNaiveUiVersion", v);
 }
 
 async function copyLink() {
-  await navigator.clipboard.writeText(location.href)
+  await navigator.clipboard.writeText(location.href);
   // eslint-disable-next-line no-alert
-  alert('Sharable URL has been copied to clipboard.')
-}
-
-function getCurrentVersion(pckName: string) {
-  const currentMapUrl = store.getImportMap().imports?.[pckName] ?? ''
-  const regex = /test@([\d.]+).js$/
-  const match = currentMapUrl.match(regex)
-  const version = match ? match[1] : 'latest'
-  return toRef(version)
+  alert("Sharable URL has been copied to clipboard.");
 }
 
 function toggleDark() {
-  const cls = document.documentElement.classList
-  cls.toggle('dark')
+  const cls = document.documentElement.classList;
+  cls.toggle("dark");
   localStorage.setItem(
-    'vue-sfc-playground-prefer-dark',
-    String(cls.contains('dark')),
-  )
-  emit('toggleTheme', cls.contains('dark'))
+    "vue-sfc-playground-prefer-dark",
+    String(cls.contains("dark"))
+  );
+  emit("toggleTheme", cls.contains("dark"));
 }
 </script>
 
 <template>
   <nav>
     <h1>
-      <img alt="logo" src="/logo.svg">
+      <img alt="logo" src="/logo.svg" />
       <span>Pro Naive UI Playground</span>
     </h1>
     <div class="links">
       <VersionSelect
-        :model-value="proNaiveUiVersion" pkg="pro-naive-ui"
-        label="Pro Naive UI Version" @update:model-value="setProNaiveUiVersion"
+        :model-value="proNaiveUiVersion"
+        pkg="pro-naive-ui"
+        label="Pro Naive UI Version"
+        @update:model-value="setProNaiveUiVersion"
       />
-      <VersionSelect v-model="store.typescriptVersion" pkg="typescript" label="TypeScript Version" />
-      <VersionSelect :model-value="vueVersion" pkg="vue" label="Vue Version" @update:model-value="setVueVersion">
+      <VersionSelect
+        :model-value="naiveUiVersion"
+        pkg="naive-ui"
+        label="Naive UI Version"
+        @update:model-value="setNaiveUiVersion"
+      />
+      <VersionSelect
+        v-model="store.typescriptVersion"
+        pkg="typescript"
+        label="TypeScript Version"
+      />
+      <VersionSelect
+        :model-value="vueVersion"
+        pkg="vue"
+        label="Vue Version"
+        @update:model-value="setVueVersion"
+      >
         <li :class="{ active: vueVersion === `@${currentCommit}` }">
           <a @click="resetVueVersion">This Commit ({{ currentCommit }})</a>
         </li>
         <li>
-          <a href="https://app.netlify.com/sites/vue-sfc-playground/deploys" target="_blank">Commits History</a>
+          <a
+            href="https://app.netlify.com/sites/vue-sfc-playground/deploys"
+            target="_blank"
+            >Commits History</a
+          >
         </li>
       </VersionSelect>
       <button
-        title="Toggle server rendering mode" class="toggle-ssr" :class="{ enabled: ssr }"
-        @click="$emit('toggleSsr')"
+        title="Toggle development production mode"
+        class="toggle-prod"
+        :class="{ prod }"
+        @click="$emit('toggleProd')"
       >
-        <span>{{ ssr ? 'SSR ON' : 'SSR OFF' }}</span>
+        <span>{{ prod ? "PROD" : "DEV" }}</span>
       </button>
       <button
-        title="Toggle editor auto save mode" class="toggle-autosave" :class="{ enabled: autoSave }"
+        title="Toggle server rendering mode"
+        class="toggle-ssr"
+        :class="{ enabled: ssr }"
+        @click="$emit('toggleSsr')"
+      >
+        <span>{{ ssr ? "SSR ON" : "SSR OFF" }}</span>
+      </button>
+      <button
+        title="Toggle editor auto save mode"
+        class="toggle-autosave"
+        :class="{ enabled: autoSave }"
         @click="$emit('toggleAutosave')"
       >
-        <span>{{ autoSave ? 'AutoSave ON' : 'AutoSave OFF' }}</span>
+        <span>{{ autoSave ? "AutoSave ON" : "AutoSave OFF" }}</span>
       </button>
       <button title="Toggle dark mode" class="toggle-dark" @click="toggleDark">
         <Sun class="light" />
@@ -114,8 +148,10 @@ function toggleDark() {
         <Reload />
       </button>
       <a
-        href="https://github.com/Zheng-Changfu/playground" target="_blank"
-        title="View on GitHub" class="github"
+        href="https://github.com/Zheng-Changfu/pro-naive-ui"
+        target="_blank"
+        title="View on GitHub"
+        class="github"
       >
         <GitHub />
       </a>
@@ -278,12 +314,12 @@ h1 img {
   display: block;
 }
 
-.links>* {
+.links > * {
   display: flex;
   align-items: center;
 }
 
-.links>*+* {
+.links > * + * {
   margin-left: 4px;
 }
 </style>
