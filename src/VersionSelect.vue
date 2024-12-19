@@ -47,6 +47,9 @@ async function fetchVersions(): Promise<string[]> {
   else if (props.pkg === 'typescript') {
     return versions.filter(v => !v.includes('dev') && !v.includes('insiders'))
   }
+  else if (props.pkg === 'pro-naive-ui') {
+    return versions.filter(v => !v.includes('1.0.0'))
+  }
   return versions
 }
 
@@ -85,20 +88,11 @@ onMounted(() => {
       <li v-if="!versions">
         <a>loading versions...</a>
       </li>
-      <li
-        v-for="(ver, index) of versions"
-        :key="index"
-        class="versions-item"
-        :class="{
-          active: ver === version || (version === 'latest' && index === 0),
-        }"
-      >
+      <li v-for="(ver, index) of versions" :key="index" class="versions-item" :class="{
+        active: ver === version || (version === 'latest' && index === 0),
+      }">
         <a @click="setVersion(ver)">v{{ ver }}</a>
-        <button
-          title="Copy Version"
-          class="version-copy"
-          @click="copyVersion(`v${ver}`)"
-        >
+        <button title="Copy Version" class="version-copy" @click="copyVersion(`v${ver}`)">
           <Copy />
         </button>
       </li>
