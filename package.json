@@ -15,7 +15,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vue/repl": "^4.4.1",
+    "@vue/repl": "^4.6.1",
+    "naive-ui": "^2.42.0",
+    "pro-naive-ui": "^2.3.2",
     "vue": "^3.4.37"
   },
   "devDependencies": {

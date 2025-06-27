@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { SFCOptions, StoreState } from "@vue/repl";
-import { Repl, mergeImportMap, useStore, useVueImportMap } from "@vue/repl";
+import { Repl, mergeImportMap, useStore, useVueImportMap, File } from "@vue/repl";
 import Monaco from "@vue/repl/monaco-editor";
 import { computed, onMounted, ref, watchEffect } from "vue";
 import Header from "./Header.vue";
 import Welcome from "./template/welcome.vue?raw";
+import Demo from "./template/Demo.vue?raw";
 
 const previewOptions = {
   headHTML: `
@@ -17,14 +18,20 @@ const previewOptions = {
     <\/script>
   `,
   customCode: {
-    importCode: `import { initCustomFormatter } from 'vue'`,
+    importCode: `import { initCustomFormatter } from 'vue'
+    import naive from 'naive-ui'
+    import proNaive from 'pro-naive-ui'
+    `,
     useCode: `if (window.devtoolsFormatters) {
     const index = window.devtoolsFormatters.findIndex((v) => v.__vue_custom_formatter)
     window.devtoolsFormatters.splice(index, 1)
     initCustomFormatter()
   } else {
     initCustomFormatter()
-  }`,
+  }
+  app.use(naive) 
+  app.use(proNaive)
+  `,
   },
 };
 
@@ -57,19 +64,15 @@ const mergedImportMap = computed(() => {
     imports: {
       "pro-naive-ui":
         (!proNaiveUiVersion.value &&
-          `https://unpkg.com/pro-naive-ui/dist/index${
-            productionMode.value ? ".prod.mjs" : ".mjs"
+          `https://unpkg.com/pro-naive-ui/dist/index${productionMode.value ? ".prod.mjs" : ".mjs"
           }`) ||
-        `https://unpkg.com/pro-naive-ui@${proNaiveUiVersion.value}/dist/index${
-          productionMode.value ? ".prod.mjs" : ".mjs"
+        `https://unpkg.com/pro-naive-ui@${proNaiveUiVersion.value}/dist/index${productionMode.value ? ".prod.mjs" : ".mjs"
         }`,
       "naive-ui":
         (!naiveUiVersion.value &&
-          `https://unpkg.com/naive-ui/dist/index${
-            productionMode.value ? ".prod.mjs" : ".mjs"
+          `https://unpkg.com/naive-ui/dist/index${productionMode.value ? ".prod.mjs" : ".mjs"
           }`) ||
-        `https://unpkg.com/naive-ui@${naiveUiVersion.value}/dist/index${
-          productionMode.value ? ".prod.mjs" : ".mjs"
+        `https://unpkg.com/naive-ui@${naiveUiVersion.value}/dist/index${productionMode.value ? ".prod.mjs" : ".mjs"
         }`,
     },
   };
@@ -116,12 +119,18 @@ const store = useStore(
     builtinImportMap: mergedImportMap as any as StoreState["builtinImportMap"],
     vueVersion,
     sfcOptions,
-    template: ref({
-      welcomeSFC: Welcome,
-    }),
   },
   hash
 );
+
+store.setFiles({
+  "App.vue": Welcome,
+  "Demo.vue": Demo,
+}, 'App.vue')
+  .then(() => {
+    store.setActive('src/Demo.vue')
+  })
+
 
 // persist state
 watchEffect(() => {
@@ -160,34 +169,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <Header
-    :store="store"
-    :prod="productionMode"
-    :ssr="useSSRMode"
-    :autoSave="autoSave"
-    @toggle-ssr="toggleSSR"
-    @reload-page="reloadPage"
-    @toggle-prod="toggleProdMode"
-    @toggle-theme="toggleTheme"
-    @toggle-autosave="toggleAutoSave"
-    @toggle-naive-ui-version="(version: string) => naiveUiVersion = version"
-    @toggle-pro-naive-ui-version="(version: string) => proNaiveUiVersion = version"
-  />
-  <Repl
-    ref="replRef"
-    :store="store"
-    :theme="theme"
-    :editor="Monaco"
-    :ssr="useSSRMode"
-    :auto-resize="true"
-    :clear-console="false"
-    :model-value="autoSave"
-    :show-compile-output="true"
-    :preview-options="previewOptions"
-    :editorOptions="{ autoSaveText: false }"
-    @keydown.ctrl.s.prevent
-    @keydown.meta.s.prevent
-  />
+  <Header :store="store" :prod="productionMode" :ssr="useSSRMode" :autoSave="autoSave" @toggle-ssr="toggleSSR"
+    @reload-page="reloadPage" @toggle-prod="toggleProdMode" @toggle-theme="toggleTheme"
+    @toggle-autosave="toggleAutoSave" @toggle-naive-ui-version="(version: string) => naiveUiVersion = version"
+    @toggle-pro-naive-ui-version="(version: string) => proNaiveUiVersion = version" />
+  <Repl ref="replRef" :store="store" :theme="theme" :editor="Monaco" :ssr="useSSRMode" :auto-resize="true"
+    :clear-console="false" :model-value="autoSave" :show-compile-output="true" :preview-options="previewOptions"
+    :editorOptions="{ autoSaveText: false }" @keydown.ctrl.s.prevent @keydown.meta.s.prevent />
 </template>
 
 <style>
