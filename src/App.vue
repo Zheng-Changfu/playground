@@ -119,14 +119,22 @@ const store = useStore(
     builtinImportMap: mergedImportMap as any as StoreState["builtinImportMap"],
     vueVersion,
     sfcOptions,
+    ...(
+      hash
+        ? {}
+        : {
+          files: ref({
+            "src/App.vue": new File('src/App.vue', Welcome),
+            "src/Demo.vue": new File('src/Demo.vue', Demo),
+          }),
+          template: ref({
+            welcomeSFC: Welcome,
+          }),
+        }
+    )
   },
   hash
 );
-
-store.setFiles({
-  "App.vue": Welcome,
-  "Demo.vue": Demo,
-}, 'App.vue')
 
 // persist state
 watchEffect(() => {
