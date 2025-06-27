@@ -127,10 +127,6 @@ store.setFiles({
   "App.vue": Welcome,
   "Demo.vue": Demo,
 }, 'App.vue')
-  .then(() => {
-    store.setActive('src/Demo.vue')
-  })
-
 
 // persist state
 watchEffect(() => {
