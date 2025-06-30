@@ -74,6 +74,8 @@ const mergedImportMap = computed(() => {
           }`) ||
         `https://unpkg.com/naive-ui@${naiveUiVersion.value}/dist/index${productionMode.value ? ".prod.mjs" : ".mjs"
         }`,
+      "@vicons/antd": "/vicons/antd.prod.mjs",
+      "@vicons/ionicons5": "/vicons/ionicons5.prod.mjs",
     },
   };
   return mergeImportMap(baseImportMap.value, customImportMap);
