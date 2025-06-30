@@ -76,6 +76,7 @@ const mergedImportMap = computed(() => {
         }`,
       "@vicons/antd": "/vicons/antd.prod.mjs",
       "@vicons/ionicons5": "/vicons/ionicons5.prod.mjs",
+      "mockjs": "/mockjs.prod.mjs"
     },
   };
   return mergeImportMap(baseImportMap.value, customImportMap);
