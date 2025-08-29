@@ -3,5 +3,11 @@
   "compatibility_date": "2025-08-29",
   "assets": {
     "directory": "./dist"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "play.pro-components.cn",
+      "custom_domain": true
+    }
+  ]
 }
