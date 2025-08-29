@@ -1,5 +1,5 @@
 {
-  "name": "worker-name",
+  "name": "playground",
   "compatibility_date": "2025-08-29",
   "assets": {
     "directory": "./dist"
